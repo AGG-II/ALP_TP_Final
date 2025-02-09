@@ -1,0 +1,5 @@
+NEIGH MOORE;
+GRID -12 13 TOROIDAL;
+STEP Mondongo {COUNT Mondongo < -3 AND COUNT GUISO > 3 THEN Guiso,
+               COUNT Sabroso  > 5 XOR (-3,-5) = Pizza THEN Minga};
+STEP {Gato, Perro} {COUNT Canario > 0 THEN Zorro}
