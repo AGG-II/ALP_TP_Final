@@ -1,0 +1,15 @@
+GRID 10 10;
+
+STATE Alive #ffffff;
+STATE Dead #000000 DEFAULT;
+
+NEIGH MOORE;
+
+STEP Alive {COUNT Alive =2 THEN Alive,
+            COUNT Alive = 3 THEN Alive,
+            COUNT Alive < 2 THEN Dead,
+            COUNT Alive > 3 THEN Dead};
+
+STEP Dead {COUNT Alive = 3 THEN Alive};
+
+START Alive {(3,5), (4,5), (4,4), (4,3), (5,4)}

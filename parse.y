@@ -55,7 +55,7 @@ Comm      : Comm ';' Comm                   { Seq $1 $3}
           | GRID int int TOROIDAL           { TorGrid $2 $3 }
           | STEP  Sts '{' Preds '}'         { Step $2 $4}
           | Neighbor                        { $1 }
-          | START '{' Coords '}' StateName  { Start $3 $5}
+          | START StateName '{' Coords '}'  { Start $2 $4}
 
 
 Neighbor  : NEIGH MOORE                     { Neigh Moore }
@@ -78,8 +78,10 @@ Preds     : Pred                            { [$1] }
 
 Pred      : Cond THEN StateName             { Pred $1 $3 }
 
-Cond      : Comp                            { Single $1 }
-          | Comp Opp Cond                   { $2 $1 $3}
+Cond      : Comp                            { $1 }
+          | Comp Opp Cond                   { $2 $1 $3 }
+          | '(' Cond ')'                    { $2 }
+          | '(' Cond ')' Opp Cond           { $4 $2 $5}
 
 Opp       : AND                             { And }
           | XOR                             { Xor }
@@ -88,6 +90,8 @@ Opp       : AND                             { And }
 Comp      : Num Ord Num                     { NumCmp $1 $2 $3 }
           | Coord '=' StateName             { StateEq $1 $3 }
           | Coord '<>' StateName            { StateNe $1 $3 }
+          | Coord '=' SELF                  { SelfEq $1 }
+          | Coord '<>' SELF                 { SelfNe $1 }
 
 Ord       : '='                             { NumEq }
           | '<'                             { NumLt }
@@ -101,7 +105,22 @@ Num       : COUNT StateName                 { Count $2 }
 {
 
 data ParseResult a = Ok a | Failed String
-                     deriving Show                     
+                     deriving Show    
+
+instance Functor ParseResult where
+    fmap f (Ok x) = Ok (f x)
+    fmap _ (Failed s) = Failed s
+
+instance Applicative ParseResult where
+    pure = return
+    (<*>) = ap
+
+instance Monad ParseResult where
+  return a = Ok a 
+  a >>= b = case a of
+                 Ok x -> b x
+                 Failed s -> Failed s
+
 type LineNumber = Int
 type P a = String -> LineNumber -> ParseResult a
 
@@ -125,7 +144,7 @@ catchP m k = \s l -> case m s l of
                         Failed e -> k e s l
 
 happyError :: P a
-happyError = \ s i -> Failed $ "Linea "++(show (i::LineNumber))++": Error de parseo \n"++(s)
+happyError = \ s i -> Failed $ "Linea "++(show (i::LineNumber))++": Error de parseo "++(s)
 
 data Token =  TState
             | TName String

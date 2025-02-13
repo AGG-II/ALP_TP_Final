@@ -2,6 +2,7 @@ module AST where
 
 type RGB = String
 type StateName = String
+type Coordinate = (Int, Int)
 
 data Comm = Seq Comm Comm
           | State StateName RGB
@@ -10,22 +11,23 @@ data Comm = Seq Comm Comm
           | TorGrid Int Int
           | Step [StateName] [Pred]
           | Neigh NeighborType
-          | Start [(Int,Int)] StateName deriving Show
+          | Start StateName [Coordinate]
+          | Empty deriving Show
 
 data NeighborType = Moore
                   | Neumann
-                  | Coord (Int, Int) deriving Show
+                  | Coord Coordinate deriving Show
 
 data Pred = Pred Cond StateName deriving Show
 
-data Cond = Single Comp
-          | And Comp Cond 
-          | Xor Comp Cond 
-          | Or Comp Cond deriving Show
-
-data Comp = NumCmp  Quantity  Ordinal Quantity
-          | StateEq (Int,Int) StateName
-          | StateNe (Int,Int) StateName deriving Show
+data Cond = NumCmp  Quantity  Ordinal Quantity
+          | StateEq Coordinate StateName
+          | StateNe Coordinate StateName
+          | SelfEq  Coordinate
+          | SelfNe  Coordinate
+          | And Cond Cond 
+          | Xor Cond Cond 
+          | Or Cond Cond deriving Show
 
 data Ordinal  = NumEq
               | NumLt
