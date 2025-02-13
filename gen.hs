@@ -138,19 +138,19 @@ createPred self (Pred c result) = let cond = createCond c self
 
 createCond :: Cond -> StateName -> (CelAuto -> Coordinate -> Bool)
 createCond (NumCmp q1 ord q2) self = let q1'  = createQuantity q1
-                                         q2'  = createQuantity q1
+                                         q2'  = createQuantity q2
                                      in createCmp ord q1' q2'
   where
     createQuantity (Count stateName) = \ca coord-> countNeighs ca coord stateName
-    createQuantity (Int x) = \ca coord -> x
+    createQuantity (Int x) = \_ _ -> x
     createCmp NumEq f1 f2 = \ca coord -> (f1 ca coord) == (f2 ca coord)
     createCmp NumLt f1 f2 = \ca coord -> (f1 ca coord) <  (f2 ca coord)
     createCmp NumGt f1 f2 = \ca coord -> (f1 ca coord) >  (f2 ca coord)
     createCmp NumNe f1 f2 = \ca coord -> (f1 ca coord) /= (f2 ca coord)
-createCond (StateEq coord cmp) self = \ca cd -> (getState ca coord) == cmp
-createCond (StateNe coord cmp) self = \ca cd -> (getState ca coord) /= cmp
-createCond (SelfEq coord) self      = \ca cd -> (getState ca coord) == self
-createCond (SelfNe coord) self      = \ca cd -> (getState ca coord) /= self
+createCond (StateEq coord cmp) self = \ca cd -> (getState ca $ sumCoords cd coord) == cmp
+createCond (StateNe coord cmp) self = \ca cd -> (getState ca $ sumCoords cd coord) /= cmp
+createCond (SelfEq coord) self      = \ca cd -> (getState ca $ sumCoords cd coord) == self
+createCond (SelfNe coord) self      = \ca cd -> (getState ca $ sumCoords cd coord) /= self
 createCond (And c1 c2) self = let c1' = createCond c1 self
                                   c2' = createCond c2 self
                                in (\ca coord -> (c1' ca coord) && (c2' ca coord))
@@ -165,7 +165,7 @@ addUniversalPred :: Predicates -> [(StateName, RGB)] -> GenResult (Predicates)
 addUniversalPred preds sts = let sts' = map fst sts
                                  universal = map ((:[]).universalPred) sts'
                                  res = zip sts' universal
-                             in  return $ mergePreds preds $ fromListPred res
+                             in  return (mergePreds preds $ fromListPred res)
 
 fillGrid :: Grid -> [(Coordinate,StateName)] -> StateName -> GenResult Grid
 fillGrid (Finite _ x y) start def = let allDef = map (\coord -> (coord, def)) [(a,b) | a <- [0..x], b <- [0..y]]
