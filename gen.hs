@@ -78,15 +78,21 @@ obtenerGrilla (Seq c1 c2) = do (g1, c1') <- obtenerGrilla c1
     compGrid _ _ _ = Failed "Error GRID: Se declaro multiples veces la forma de la grilla."
 obtenerGrilla (Grid x y) | x == 0 || y == 0 = Failed "Error: Se declaro un Grid imposible de dimension 0."
                          |  x < 0 || y < 0  = Failed "Error: Se declaro un Grid imposible de dimension negativa."
-                         | otherwise        = return (Just (Finite emptyMap x y ) , Empty)
+                         | otherwise        = return (Just (Finite emptyCells x y ) , Empty)
 obtenerGrilla (TorGrid x y) | x == 0 || y == 0 = Failed "Error: Se declaro un Grid imposible de dimension 0."
                             |  x < 0 || y < 0  = Failed "Error: Se declaro un Grid imposible de dimension negativa."
-                            | otherwise        = return (Just (Toroidal emptyMap x y ) , Empty)
+                            | otherwise        = return (Just (Toroidal emptyCells x y ) , Empty)
 obtenerGrilla x = return (Nothing,x)
 
 checkGrid :: Maybe Grid -> GenResult Grid
 checkGrid Nothing = Failed "Error GRID: No se declaro una grilla."
 checkGrid (Just x) = return x
+
+fillGrid :: Grid -> [(Coordinate,StateName)] -> StateName -> GenResult Grid
+fillGrid (Finite _ x y) start def = let allDef = genDef x y def
+                                    in  return (Finite (modifyCells allDef start) x y)
+fillGrid (Toroidal _ x y) start def = let allDef = genDef x y def
+                                      in  return (Toroidal (modifyCells allDef start) x y)
 
 obtenerVecinos :: Comm -> GenResult (Neighbors, Comm)
 obtenerVecinos (Seq c1 c2) = do (g1, c1') <- obtenerVecinos c1
@@ -166,16 +172,6 @@ addUniversalPred preds sts = let sts' = map fst sts
                                  universal = map ((:[]).universalPred) sts'
                                  res = zip sts' universal
                              in  return (mergePreds preds $ fromListPred res)
-
-fillGrid :: Grid -> [(Coordinate,StateName)] -> StateName -> GenResult Grid
-fillGrid (Finite _ x y) start def = let allDef = map (\coord -> (coord, def)) [(a,b) | a <- [0..x], b <- [0..y]]
-                                        gridDef = fromListStates allDef
-                                        startStates = fromListStates start
-                                    in  return (Finite (unionStates startStates gridDef) x y)
-fillGrid (Toroidal _ x y) start def = let allDef = map (\coord -> (coord, def)) [(a,b) | a <- [0..x], b <- [0..y]]
-                                          gridDef = fromListStates allDef
-                                          startStates = fromListStates start
-                                      in  return (Toroidal (unionStates startStates gridDef) x y)
 
 mergeComm :: Comm -> Comm -> Comm
 mergeComm Empty c = c

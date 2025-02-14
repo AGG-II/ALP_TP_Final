@@ -1,4 +1,4 @@
-GRID 10 10;
+GRID 10 10 TOROIDAL;
 
 STATE Alive #ffffff;
 STATE Dead #000000 DEFAULT;
@@ -12,4 +12,4 @@ STEP Alive {COUNT Alive = 2 THEN Alive,
 
 STEP Dead {COUNT Alive = 3 THEN Alive};
 
-START Alive {(3,5), (4,5), (4,4), (4,3), (5,4)}
+START Alive {(3,5), (4,5), (5,5), (5,6), (4,7)}
