@@ -2,23 +2,56 @@ import AST
 import Parse
 import Gen
 import Data.HashMap.Strict as M
+import Data.Vector as V
 import CelAutoGen
+import CAGraphics
 main = do
          handle <- readFile "rule90.ca"
          let ca = fromOk $ construir handle
-         print (grid ca)
-         print ""
-         print ""
-         print ""
-         print (grid (next ca))
-         --mostrarPasos 0 100 ca
+         let res = correr ca "rule90"
+         print "Finalizado con Exito!"
+         --cuanto <- getLine
+         --mostrar (grid ca)
+         --miRepeat 0 (read cuanto) ca
   where 
     fromJust (Just x) = x
     fromOk (Ok x) = x
+{-    
+miRepeat x x' ca = do print ""
+                      print ""
+                      print ""
+                      print ""
+                      print ""
+                      print ""
+                      print ""
+                      print ""
+                      print ""
+                      print ""
+                      print ""
+                      print ""
+                      print ""
+                      print ""
+                      print ""
+                      print ("Paso numero " Prelude.++ (show x) Prelude.++ ".")
+                      mostrar (grid ca)
+                      if x == x'
+                      then return ()
+                      else miRepeat (x+1) x' (next ca)
 
-{-mostrarPasos x y ca = if x == y 
-                      then
-                      else
+mostrar (Finite cells x y) = imprimir 0 y cells
+  where
+    imprimir x x' cells = if x == x'
+                          then return ()
+                          else do imprimirFila (cells V.! x)
+                                  imprimir (x+1) x' cells
+mostrar (Toroidal cells x y) = imprimir 0 y cells
+  where
+    imprimir x x' cells = if x == x'
+                          then return ()
+                          else do imprimirFila (cells V.! x)
+                                  imprimir (x+1) x' cells
+
+imprimirFila fila =  print (V.map (\(_,st) -> if st == "Off" then ' ' else '0') fila) 
 -}
 construir s = do arbol <- parseador s
                  (maybeDef, resto) <- obtenerDefState arbol
@@ -32,7 +65,7 @@ construir s = do arbol <- parseador s
                  (preds, fin) <- obtenerPredicados (M.fromList sts) resto4
                  universalPreds <- addUniversalPred preds sts
                  fullGrid <- fillGrid grid start def
-                 return (CA  fullGrid def (M.fromList sts) neigh universalPreds)
+                 return $ createCA fullGrid def (M.fromList sts) neigh universalPreds
 
 {-coso ca coord = if getState ca coord == "Alive"
                 then '0'
@@ -42,22 +75,3 @@ construir s = do arbol <- parseador s
 foreach [] = return ()
 foreach (x:xs) = do print x
                     foreach xs
-next :: CelAuto -> CelAuto
-next ca = let newGrid = next' ca (grid ca)
-          in  modifyGrid ca newGrid
-  where
-    modifyGrid (CA _ def sts neigh preds) newGrid = CA newGrid def sts neigh preds
-    next' ca (Finite grid x y) = Finite (mapCells (applyNext ca) grid) x y
-    next' ca (Toroidal grid x y) = Toroidal (mapCells (applyNext ca) grid) x y
-
-applyNext :: CelAuto -> (Coordinate, StateName) -> (Coordinate,StateName)
-applyNext ca (coord,self) = let preds = step ca
-                                conds = fromJust (M.lookup self preds)
-                            in  getNewState ca coord conds
-  where
-    fromJust (Just x) = x
-    getNewState ca coord (f:fs) = case f ca coord of
-                                  Nothing       -> getNewState ca coord fs
-                                  Just newState -> (coord,newState)
-nextMultiple 0 ca = ca
-nextMultiple x ca = next $ nextMultiple (x-1) ca
