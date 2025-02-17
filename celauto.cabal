@@ -1,0 +1,16 @@
+cabal-version:      2.4
+name:               celauto
+version:            0.1.0.0
+
+author:             AGG-II
+maintainer:         andresgrillo01@gmail.com
+
+extra-source-files: CHANGELOG.md
+
+executable ALP-TP-Final
+    main-is:          Main.hs
+    hs-source-dirs:   app, modules, examples
+    other-modules:    AST CAGraphics CelAutoGen Gen Parse
+    build-tool-depends: happy:happy
+    build-depends:    base ^>=4.15.0.0, gloss, vector, unordered-containers, freeglut
+    default-language: Haskell2010

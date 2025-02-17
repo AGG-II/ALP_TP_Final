@@ -6,29 +6,29 @@ import Parse
 
 type StateList = [(StateName, RGB)]
 
-obtenerDefState :: Comm -> GenResult(Maybe StateName, Comm)
-obtenerDefState (Seq c1 c2) = do (l1, c1') <- obtenerDefState c1
-                                 (l2, c2') <- obtenerDefState c2
-                                 compDef l1 l2 (mergeComm c1' c2')
+getDefState :: Comm -> GenResult(Maybe StateName, Comm)
+getDefState (Seq c1 c2) = do (l1, c1') <- getDefState c1
+                             (l2, c2') <- getDefState c2
+                             compDef l1 l2 (mergeComm c1' c2')
   where
    compDef Nothing g c = return (g, c)
    compDef g Nothing c = return (g, c)
    compDef (Just l1) (Just l2)  _ = Failed ("Error: Se declaro dos veces el estado DEFAULT (" ++ l1 ++ " y " ++ l2 ++ ")." )
-obtenerDefState (DefState name rgb) = return (Just name, State name rgb)                       
-obtenerDefState x = return (Nothing,x)
+getDefState (DefState name rgb) = return (Just name, State name rgb)                       
+getDefState x = return (Nothing,x)
 
 checkDef :: Maybe StateName -> GenResult StateName
 checkDef Nothing = Failed "Error DEFAULT: No se declaro un estado por defecto."
 checkDef (Just x) = return x
 
-obtenerEstados ::  Comm -> GenResult (StateList,Comm)
-obtenerEstados (Seq c1 c2) = do (l1, c1') <- obtenerEstados c1
-                                (l2, c2') <- obtenerEstados c2
-                                case mergeStates l1 l2 of
-                                  Left e -> Failed e
-                                  Right l3 -> return (l3, mergeComm c1' c2')
-obtenerEstados (State name rgb) = return ([(name, rgb)], Empty)
-obtenerEstados x = return ([],x)
+getStates ::  Comm -> GenResult (StateList,Comm)
+getStates (Seq c1 c2) = do (l1, c1') <- getStates c1
+                           (l2, c2') <- getStates c2
+                           case mergeStates l1 l2 of
+                            Left e -> Failed e
+                            Right l3 -> return (l3, mergeComm c1' c2')
+getStates (State name rgb) = return ([(name, rgb)], Empty)
+getStates x = return ([],x)
 
 checkStates :: States -> Comm -> GenResult ()
 checkStates states c = let ret = elimDup $ filter (not.(memberState states)) $ getStates' c
@@ -68,21 +68,21 @@ elimDup (x:xs) = let ret = elimDup xs
                     then ret
                     else (x:xs)
 
-obtenerGrilla :: Comm -> GenResult (Maybe Grid , Comm)
-obtenerGrilla (Seq c1 c2) = do (g1, c1') <- obtenerGrilla c1
-                               (g2, c2') <- obtenerGrilla c2
-                               compGrid g1 g2 (mergeComm c1' c2') 
+getGrid :: Comm -> GenResult (Maybe Grid , Comm)
+getGrid (Seq c1 c2) = do (g1, c1') <- getGrid c1
+                         (g2, c2') <- getGrid c2
+                         compGrid g1 g2 (mergeComm c1' c2') 
   where
     compGrid Nothing g c = return (g, c)
     compGrid g Nothing c = return (g, c)
     compGrid _ _ _ = Failed "Error GRID: Se declaro multiples veces la forma de la grilla."
-obtenerGrilla (Grid x y) | x == 0 || y == 0 = Failed "Error: Se declaro un Grid imposible de dimension 0."
+getGrid (Grid x y) | x == 0 || y == 0 = Failed "Error: Se declaro un Grid imposible de dimension 0."
                          |  x < 0 || y < 0  = Failed "Error: Se declaro un Grid imposible de dimension negativa."
                          | otherwise        = return (Just (Finite emptyCells x y ) , Empty)
-obtenerGrilla (TorGrid x y) | x == 0 || y == 0 = Failed "Error: Se declaro un Grid imposible de dimension 0."
+getGrid (TorGrid x y) | x == 0 || y == 0 = Failed "Error: Se declaro un Grid imposible de dimension 0."
                             |  x < 0 || y < 0  = Failed "Error: Se declaro un Grid imposible de dimension negativa."
                             | otherwise        = return (Just (Toroidal emptyCells x y ) , Empty)
-obtenerGrilla x = return (Nothing,x)
+getGrid x = return (Nothing,x)
 
 checkGrid :: Maybe Grid -> GenResult Grid
 checkGrid Nothing = Failed "Error GRID: No se declaro una grilla."
@@ -94,24 +94,24 @@ fillGrid (Finite _ x y) start def = let allDef = genDef x y def
 fillGrid (Toroidal _ x y) start def = let allDef = genDef x y def
                                       in  return (Toroidal (modifyCells allDef start) x y)
 
-obtenerVecinos :: Comm -> GenResult (Neighbors, Comm)
-obtenerVecinos (Seq c1 c2) = do (g1, c1') <- obtenerVecinos c1
-                                (g2, c2') <- obtenerVecinos c2
-                                return (mergeNeighs g1 g2, mergeComm c1' c2')
+getNeighbors :: Comm -> GenResult (Neighbors, Comm)
+getNeighbors (Seq c1 c2) = do (g1, c1') <- getNeighbors c1
+                              (g2, c2') <- getNeighbors c2
+                              return (mergeNeighs g1 g2, mergeComm c1' c2')
   where
     mergeNeighs [] g = g
     mergeNeighs g [] = g
     mergeNeighs xs ys = let ys' = filter (\y -> y `notElem` xs) ys
                         in  (xs++ys')
-obtenerVecinos (Neigh Moore) = return ([(1,0),(-1,0),(0,1),(0,-1),(1,1),(-1,-1),(-1,1),(1,-1)],Empty)
-obtenerVecinos (Neigh Neumann) = return ([(1,0),(-1,0),(0,1),(0,-1)],Empty)
-obtenerVecinos (Neigh (Coord coord)) = return ([coord], Empty)
-obtenerVecinos x = return ([],x)
+getNeighbors (Neigh Moore) = return ([(1,0),(-1,0),(0,1),(0,-1),(1,1),(-1,-1),(-1,1),(1,-1)],Empty)
+getNeighbors (Neigh Neumann) = return ([(1,0),(-1,0),(0,1),(0,-1)],Empty)
+getNeighbors (Neigh (Coord coord)) = return ([coord], Empty)
+getNeighbors x = return ([],x)
 
-obtenerInicio :: Grid -> States -> Comm -> GenResult ([(Coordinate,StateName)] , Comm)
-obtenerInicio grid states (Seq c1 c2) = do (l1, c1') <- obtenerInicio grid states c1
-                                           (l2, c2') <- obtenerInicio grid states c2
-                                           mergeInicios l1 l2 (mergeComm c1' c2')
+getStart :: Grid -> States -> Comm -> GenResult ([(Coordinate,StateName)] , Comm)
+getStart grid states (Seq c1 c2) = do (l1, c1') <- getStart grid states c1
+                                      (l2, c2') <- getStart grid states c2
+                                      mergeInicios l1 l2 (mergeComm c1' c2')
   where
     mergeInicios l1 l2 c = let l1' = map fst l1
                                l2' = map fst l2 
@@ -119,19 +119,19 @@ obtenerInicio grid states (Seq c1 c2) = do (l1, c1') <- obtenerInicio grid state
                            in  if null inter
                                then return (l1 ++ l2, c)
                                else Failed ("Error: Se declararon la/s coordenada/s " ++ show inter ++ " con mas de un estado inicial.")
-obtenerInicio grid states (Start stateName xs) = if null outside
+getStart grid states (Start stateName xs) = if null outside
                                                  then return (map (\c -> (c, stateName)) xs ,Empty)
                                                  else Failed ("Error de START: Las coordenadas " ++ show outside ++ " no son validas para este tablero.")
   where
     outside = filter (not.(inGrid grid)) xs
-obtenerInicio _ _ x = return ([],x)
+getStart _ _ x = return ([],x)
 
-obtenerPredicados :: States -> Comm -> GenResult ( Predicates,Comm)
-obtenerPredicados states (Seq c1 c2) = do (l1, c1') <- obtenerPredicados states c1
-                                          (l2, c2') <- obtenerPredicados states c2
-                                          return (mergePreds l1 l2 ,(mergeComm c1' c2'))
-obtenerPredicados states (Step stateNames preds) = return (foldl mergePreds emptyPreds (map (createPreds preds) stateNames), Empty)
-obtenerPredicados _ x = return (emptyPreds,x)
+getPredicates :: States -> Comm -> GenResult ( Predicates,Comm)
+getPredicates states (Seq c1 c2) = do (l1, c1') <- getPredicates states c1
+                                      (l2, c2') <- getPredicates states c2
+                                      return (mergePreds l1 l2 ,(mergeComm c1' c2'))
+getPredicates states (Step stateNames preds) = return (foldl mergePreds emptyPreds (map (createPreds preds) stateNames), Empty)
+getPredicates _ x = return (emptyPreds,x)
 
 createPreds :: [Pred] -> StateName -> Predicates
 createPreds xs self = let functions = (map (createPred self) xs)
