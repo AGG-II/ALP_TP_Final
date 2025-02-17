@@ -1,4 +1,4 @@
-GRID 10 10;
+GRID 1000 100 TOROIDAL;
 
 STATE Alive #ffffff;
 STATE Off #000000 DEFAULT;
@@ -7,7 +7,7 @@ NEIGH (-1, 1);
 
 NEIGH (1,1);
 
-STEP {Alive, Off} {(1,1) = Alive AND (-1,1) = Off THEN Alive,
-                   (1,1) = Off AND (-1,1) = Alive THEN Alive};
+STEP {Alive, Off} {(-1,-1) = Alive AND (1,-1) = Off THEN Alive,
+                   (-1,-1) = Off AND (1,-1) = Alive THEN Alive};
 
-START Alive {(5,9)}
+START Alive {(5,0)}

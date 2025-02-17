@@ -8,7 +8,7 @@ import CAGraphics
 main = do
          handle <- readFile "rule90.ca"
          let ca = fromOk $ construir handle
-         let res = correr ca "rule90"
+         correr ca "rule90"
          print "Finalizado con Exito!"
          --cuanto <- getLine
          --mostrar (grid ca)

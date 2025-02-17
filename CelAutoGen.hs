@@ -107,9 +107,8 @@ makeColor xs = let (r,g,b) = hexToRGB xs
 
 -- Esto lo hizo chatGTP
 hexToRGB :: String -> (Int, Int, Int)
-hexToRGB ('#':hex) = 
-    let [r, g, b] = Prelude.map (Prelude.fst . Prelude.head . readHex) (chunksOf 2 hex)
-    in (r, g, b)
+hexToRGB hex = let [r, g, b] = Prelude.map (Prelude.fst . Prelude.head . readHex) (chunksOf 2 hex)
+               in (r, g, b)
 
 chunksOf :: Int -> [a] -> [[a]]
 chunksOf _ [] = []
