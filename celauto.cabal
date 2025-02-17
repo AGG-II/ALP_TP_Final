@@ -7,7 +7,7 @@ maintainer:         andresgrillo01@gmail.com
 
 extra-source-files: CHANGELOG.md
 
-executable celullarAutomata
+executable cellularAutomata
     main-is:          Main.hs
     hs-source-dirs:   app, modules, examples
     other-modules:    AST CAGraphics CelAutoGen Gen Parse
