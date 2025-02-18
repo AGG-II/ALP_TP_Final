@@ -10,7 +10,7 @@ correr ca name = let (x,y) = getDimGrid ca
                  in  simulate 
                        (window name)
                        white       
-                       1
+                       10
                        ca
                        (render thisGrid myDrawCell)
                        update      
