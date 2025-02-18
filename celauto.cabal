@@ -1,4 +1,4 @@
-cabal-version:      2.4
+cabal-version:      3.12
 name:               celauto
 version:            0.1.0.0
 
@@ -12,5 +12,5 @@ executable cellularAutomata
     hs-source-dirs:   app, modules, examples
     other-modules:    AST CAGraphics CelAutoGen Gen Parse
     build-tool-depends: happy:happy
-    build-depends:    base ^>=4.15.0.0, gloss, vector, unordered-containers, array
+    build-depends:    base ^>=4.18.0.0, gloss, vector, unordered-containers, array
     default-language: Haskell2010
