@@ -23,9 +23,10 @@ construir s = do ast <- parseador s
                  checkStates mapSts rest1
                  (maybeGrid, rest2) <- getGrid rest1
                  grid <- checkGrid maybeGrid
-                 (neigh, rest3) <- getNeighbors rest2
+                 (neighs, rest3) <- getNeighbors rest2
+                 allNeighs <- filterNeighbors neighs grid
                  (start, rest4) <- getStart grid mapSts rest3
                  (preds, fin) <- getPredicates mapSts rest4
                  universalPreds <- addUniversalPred preds sts
                  fullGrid <- fillGrid grid start def
-                 return $ createCA fullGrid def mapSts neigh universalPreds
+                 return $ createCA fullGrid def mapSts allNeighs universalPreds

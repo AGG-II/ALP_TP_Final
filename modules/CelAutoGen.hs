@@ -90,8 +90,8 @@ getState ca coord = getState' (grid ca) (defState ca) coord
                                                        b' = b `mod` y
                                                    in  fromJust $ getState'' (a', b') cells
    getState'' coord cells = case getElem coord cells of
-                          Nothing -> Nothing
-                          Just (_,state) -> Just state
+                            Nothing -> Nothing
+                            Just (_,state) -> Just state
    fromJust (Just x) = x
 
 universalPred :: StateName -> Predicate
@@ -105,14 +105,6 @@ makeColor :: String -> Color
 makeColor xs = let (r,g,b) = hexToRGB xs
                in  makeColorI r g b 255
 
--- Esto lo hizo chatGTP
-hexToRGB :: String -> (Int, Int, Int)
-hexToRGB hex = let [r, g, b] = Prelude.map (Prelude.fst . Prelude.head . readHex) (chunksOf 2 hex)
-               in (r, g, b)
-
-chunksOf :: Int -> [a] -> [[a]]
-chunksOf _ [] = []
-chunksOf n xs = Prelude.take n xs : chunksOf n (Prelude.drop n xs)
 
 getDimGrid :: CelAuto -> (Int,Int)
 getDimGrid ca = case grid ca of
@@ -142,4 +134,14 @@ getColor stsCol name = fromJust $ M.lookup name stsCol
   where
     fromJust (Just x) = x
 
+toListCells :: Vector (Vector a) -> [a]
 toListCells grid = V.toList $ V.foldl (V.++) V.empty grid
+
+-- Esto lo hizo chatGTP ↓
+hexToRGB :: String -> (Int, Int, Int)
+hexToRGB hex = let [r, g, b] = Prelude.map (Prelude.fst . Prelude.head . readHex) (chunksOf 2 hex)
+               in (r, g, b)
+
+chunksOf :: Int -> [a] -> [[a]]
+chunksOf _ [] = []
+chunksOf n xs = Prelude.take n xs : chunksOf n (Prelude.drop n xs)

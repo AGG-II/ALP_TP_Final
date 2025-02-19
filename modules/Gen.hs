@@ -31,7 +31,7 @@ getStates (State name rgb) = return ([(name, rgb)], Empty)
 getStates x = return ([],x)
 
 checkStates :: States -> Comm -> GenResult ()
-checkStates states c = let ret = elimDup $ filter (not.(memberState states)) $ getStates' c
+checkStates states c = let ret = nub $ filter (not.(memberState states)) $ getStates' c
                        in if null ret
                           then Ok ()
                           else Failed ("Error: Se hace referencia a los siguientes estados no definidos: " ++ showStates ret)
@@ -62,11 +62,6 @@ getStates' (Step stateNames preds) = let predStates = getPredsStates preds
   getQuantityState (Count stateName)  = [stateName]
   getQuantityState _                  = []
 getStates' _ = []
-elimDup [] = []
-elimDup (x:xs) = let ret = elimDup xs
-                 in if elem x ret
-                    then ret
-                    else (x:xs)
 
 getGrid :: Comm -> GenResult (Maybe Grid , Comm)
 getGrid (Seq c1 c2) = do (g1, c1') <- getGrid c1
@@ -107,6 +102,22 @@ getNeighbors (Neigh Moore) = return ([(1,0),(-1,0),(0,1),(0,-1),(1,1),(-1,-1),(-
 getNeighbors (Neigh Neumann) = return ([(1,0),(-1,0),(0,1),(0,-1)],Empty)
 getNeighbors (Neigh (Coord coord)) = return ([coord], Empty)
 getNeighbors x = return ([],x)
+
+filterNeighbors :: Neighbors -> Grid -> GenResult Neighbors
+filterNeighbors neighs (Finite _ x y) = return $ nub $ map modNeigh neighs
+  where
+    modNeigh (a,b) = let a' = a `mod` x
+                         b' = b `mod` y
+                         a'' = if a < 0 then a' - x else a'
+                         b'' = if b < 0 then b' - y else b'
+                     in  (a'', b'')
+filterNeighbors neighs (Toroidal _ x y) = return $ nub $ map modNeigh neighs
+  where
+    modNeigh (a,b) = let a' = a `mod` x
+                         b' = b `mod` y
+                         a'' = if a < 0 then a' - x else a'
+                         b'' = if b < 0 then b' - y else b'
+                     in  (a'', b'')
 
 getStart :: Grid -> States -> Comm -> GenResult ([(Coordinate,StateName)] , Comm)
 getStart grid states (Seq c1 c2) = do (l1, c1') <- getStart grid states c1

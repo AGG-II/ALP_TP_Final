@@ -1,13 +1,12 @@
-GRID 100 100 TOROIDAL;
+GRID 100 100;
 
-STATE Alive #ff0000;
+STATE On #ff0000;
 STATE Off #001aff DEFAULT;
 
-NEIGH (-1, 1);
+NEIGH (-1,-1);
 
-NEIGH (1,1);
+NEIGH (1,-1);
 
-STEP {Alive, Off} {(-1,-1) = Alive AND (1,-1) = Off THEN Alive,
-                   (-1,-1) = Off AND (1,-1) = Alive THEN Alive};
+STEP {On, Off} {COUNT On = 1 THEN On};
 
-START Alive {(49,0)}
+START On {(49,0)}
