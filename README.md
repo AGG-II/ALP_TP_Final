@@ -1,8 +1,5 @@
 # Autómatas celulares
 
-Para ver la descripción del proyecto ir al [link](AutomataCel.pdf).
-
-(seccion1)=
 ## 1- Instalacion del proyecto
 
 El código fue testeado en una computadora con windows 10 y otra con Ubuntu 24.0.1.
@@ -76,7 +73,7 @@ El DSL tiene 5 comandos para poder definir el autómata celular. Estos comandos 
 - STEP
 - START -- No obligatorio
 
-El orden de aparición en el archivo de definición no es importante (excepto para el comando [STEP](#step)).
+El orden de aparición en el archivo de definición no es importante (excepto para el comando STEP).
 
 Todos los comandos deben finalizar con un ";" excepto el último el cual no debe terminar con nada.
 
@@ -166,12 +163,8 @@ NEIGH (0,1)
 #### NEUMANN
 La vecindad de Von Neumann refiere a todas las celdas que se encuentran a distancia 1 de la celda.
 
-![Von Neumann neighboorhood](images/neumann.png)
-
 #### MOORE
 Parecida a la vecindad de Von Neumann, la vecidad de Moore incluye todas las celdas a distancia 1 más las esquinas de la celda.
-
-![Moore neighboorhood](images/moore.png)
 
 #### Referencia (x,y)
 Como la vecindad de Moore y Von Neumann no son suficientes para poder definir todos los tipos de vecindad. Queda la opción de definir a partir de coordenadas relativas a la celda. Supongamos que nuestra vecindad define que la celda (10,10) es vecina de la celda (2,1) entonces para poder expresar esto en el archivo habría que escribir:
@@ -192,7 +185,7 @@ NEIGH (101,101)
 GRID 100 100;
 NEIGH (1,1)
 ```
-(step)=
+
 ### STEP
 Este comando permite definir la funcion de transición.
 
@@ -258,7 +251,7 @@ En este comando, las coordenadas provistas comenzaran en el estado que es pasado
 
 A la hora de intentar correr el código surgió un error en todas las PCs en las que se intentó correr originalmente el programa. El error era "unkown GLUT entry glutInit" y estaba presente tanto en windows como en linux. Después de realizar múltiples búsquedas e intentar varias soluciones propuestas en distintos foros, encontré la solución para ambos SOs.
 
-En el caso de linux la solución fue instalar los paquetes mencionados anteriormente en la [sección 1 de instalación del proyecto.](#seccion1)
+En el caso de linux la solución fue instalar los paquetes mencionados anteriormente en la sección 1 de instalación del proyecto.
 
 En el caso de windows, pude encontrar un foro que explicaba como solucionar el problema. Era necesario tener en una carpeta, que contenga el ejecutable, el archivo "freeglut.dll". Sin embargo yo no contaba con dicho archivo así que tuve que encontrar donde descargarlo.
 
@@ -273,11 +266,8 @@ https://hackage.haskell.org/package/unordered-containers-0.2.20/docs/Data-HashMa
 
 https://hackage.haskell.org/package/gloss
 
-#### Juego de la vida de Conway en Haskell (inspiración para la parte gráfica):
-https://github.com/alexbooth/Game-of-Life-Haskell
+#### [Juego de la vida de Conway en Haskell (inspiración para la parte gráfica)](https://github.com/alexbooth/Game-of-Life-Haskell)
 
-#### Solución a problema de gloss en Windows:
-http://gloss.ouroborus.net/#:~:text=on%20windows%2C%20when%20i%20try%20to%20run%20a%20gloss%20program
+#### [Solución a problema de gloss en Windows](http://gloss.ouroborus.net/#:~:text=on%20windows%2C%20when%20i%20try%20to%20run%20a%20gloss%20program)
 
-#### FREEGLUT para Windows:
-https://www.transmissionzero.co.uk/software/freeglut-devel/
+#### [FREEGLUT para Windows](https://www.transmissionzero.co.uk/software/freeglut-devel/)
