@@ -46,6 +46,7 @@ La estructura del proyecto es la siguiente:
 |   |-- CelAutoGen.hs
 |   |-- Gen.hs
 |   |-- Parse.hs
+|-- AutomataCel.pdf
 |-- celauto.cabal
 |-- freeglut.dll -- necesario para que corra en windows
 |-- parse.y
@@ -53,10 +54,10 @@ La estructura del proyecto es la siguiente:
 
 ```
 
-## 4-Desiciones tomadas
+## 4-Decisiones tomadas
 
 #### La estructura de la grilla
-Debido a que la función de transición se debe aplicar a cada una de las celdas y además esta función hace referencias a los vecinos de la celda, era necesario que la estructura utilizada para representar la grilla de celdas tuviese accesos rápidos a cualquier celda. Originalmente utlizé un hash map para representar la grilla pero resultó ser insuficiente (O(log(n))) para grillas de tamaño medio, 100x100 por ejemplo. Por lo tanto la grilla se representa con un Vector (Vector ((Int,Int), String)) (O(1)).
+Debido a que la función de transición se debe aplicar a cada una de las celdas y además esta función hace referencias a los vecinos de la celda, era necesario que la estructura utilizada para representar la grilla de celdas tuviese accesos rápidos a cualquier celda. Originalmente utlicé un hash map para representar la grilla pero resultó ser insuficiente (O(log(n))) para grillas de tamaño medio, 100x100 por ejemplo. Por lo tanto la grilla se representa con un Vector (Vector ((Int,Int), String)) (O(1)).
 
 
 #### Los gráficos
@@ -124,7 +125,7 @@ La sintaxis del comando es:
 STATE [Nombre] [#rgb] [DEFAULT]
 ```
 
-Ejemplos de comando GRID:
+Ejemplos de comando STATE:
 
 ```
 STATE Gato #ffffff DEFAULT
